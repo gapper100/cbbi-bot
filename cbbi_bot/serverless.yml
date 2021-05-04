@@ -1,0 +1,20 @@
+org: gapper100
+app: cbbi-bot
+service: telegram-bot
+frameworkVersion: “>=1.2.0 <2.0.0”
+provider:
+  name: aws
+  runtime: python3.7
+  region: eu-west-1
+  environment:
+    TELEGRAM_TOKEN: ${param:TELEGRAM_TOKEN, env:TELEGRAM_TOKEN}
+    TELEGRAM_CRYPTO_CHAT_ID: ${param:TELEGRAM_CRYPTO_CHAT_ID, env:TELEGRAM_CRYPTO_CHAT_ID_TEST}
+    TELEGRAM_CBBI_CHANNEL_ID: ${param:TELEGRAM_CBBI_CHANNEL_ID, env:TELEGRAM_CBBI_CHANNEL_ID_TEST}
+functions:
+  cron:
+    handler: handler.send_message
+    events:
+      # Invoke Lambda function (production at 8:00 UTC every day)
+      - schedule: cron(00/5 * * * ? *) # development
+#      - schedule: cron(02/5 * * * ? *) # acceptance
+#      - schedule: cron(00 8 * * ? *) # production
