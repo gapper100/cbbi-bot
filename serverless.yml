@@ -1,7 +1,7 @@
 org: gapper100
 app: cbbi-bot
 service: telegram-bot
-frameworkVersion: 2.39.0
+frameworkVersion: '^2.39.0'
 provider:
   name: aws
   runtime: python3.9
