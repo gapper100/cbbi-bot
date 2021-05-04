@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta
+from typing import Dict
 
 import pytz
 import requests
@@ -13,7 +14,7 @@ from constants import (
 from loguru import logger
 
 
-def get_cbbi_data() -> dict[str, dict[str, float]]:
+def get_cbbi_data() -> Dict[str, Dict[str, float]]:
     """Get JSON data from the API at colintalkscrypto.com/cbbi/data/latest.json.
 
     Returns:
@@ -103,7 +104,7 @@ def custom_strftime(format_: str, timestamp: datetime) -> str:
     )
 
 
-def get_emoji_dict(data: dict[str, dict[str, float]]) -> dict[str, str]:
+def get_emoji_dict(data: Dict[str, Dict[str, float]]) -> Dict[str, str]:
     """Create a dictionary of emojis showing whether a value has gone up,
         gone down, or stayed the same compared to yesterday.
 
@@ -151,8 +152,8 @@ def get_full_metric_name(metric: str) -> str:
 
 
 def format_metric_message(
-    data: dict[str, dict[str, float]],
-    emoji_dict: dict[str, str],
+    data: Dict[str, Dict[str, float]],
+    emoji_dict: Dict[str, str],
     metric: str,
     today_timestamp: str,
 ) -> str:
@@ -175,7 +176,7 @@ def format_metric_message(
     )
 
 
-def format_telegram_message(data: dict[str, dict[str, float]]) -> str:
+def format_telegram_message(data: Dict[str, Dict[str, float]]) -> str:
     """Format the Telegram message to be sent to the chats.
 
     Args:
