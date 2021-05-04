@@ -32,7 +32,7 @@ LONG_PARAMETER_NAMES = {
     "Confidence": "CBBI",
     "Price": "Bitcoin price",
     "GoldenRatio": "The Golden 51%-49% Ratio",
-    "GoogleTrends": '"Bitcoin" search term (Google)',
+    "GoogleTrends": '"Bitcoin" Google search term',
     "StockToFlow": "Stock-To-Flow Chart",
     "PiCycle": "Pi Cycle Top Indicator",
     "2YMA": "2 Year Moving Average",
