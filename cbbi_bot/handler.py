@@ -5,6 +5,13 @@ from loguru import logger
 
 
 def send_message(event=None, context=None) -> None:
+    """Send a CBBI update to Telegram chats.
+
+    Args:
+        event: A Telegram Event object.
+        context: A Telegram Context object.
+
+    """
     logger.info("Sending daily CBBI update!")
     data = get_cbbi_data()
     message = format_telegram_message(data)
