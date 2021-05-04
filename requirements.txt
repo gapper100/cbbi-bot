@@ -1,3 +1,4 @@
+loguru==0.5.3
 requests==2.25.1
 pytz==2021.1
-python-telegram-bot==12.2.0
+python-telegram-bot==13.5

@@ -1,10 +1,10 @@
 org: gapper100
 app: cbbi-bot
 service: telegram-bot
-frameworkVersion: 2.39.0
+frameworkVersion: '^2.39.1'
 provider:
   name: aws
-  runtime: python3.7
+  runtime: python3.8
   region: eu-west-1
   environment:
     TELEGRAM_TOKEN: ${param:TELEGRAM_TOKEN, env:TELEGRAM_TOKEN}

@@ -1,0 +1,7 @@
+# External package requirements
+-r requirements.txt
+
+# Development requirements
+pre-commit==2.12.1
+flake8==3.9.1
+black==21.4b2
