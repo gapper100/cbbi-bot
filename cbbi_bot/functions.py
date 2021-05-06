@@ -169,6 +169,8 @@ def get_message_header(
         A nicely formatted header string.
 
     """
+    logger.debug("Formatting message header line")
+
     cbbi_link = "[CBBI](https://cbbi.info/)"
     cbbi_today = float(data[CBBI_INDEX_KEY][timestamp])
     cbbi_warning = " ❗" if cbbi_today >= 0.9 else ""
@@ -194,6 +196,8 @@ def get_message_cbbi(
         A nicely formatted string for the CBBI.
 
     """
+    logger.debug("Formatting message line for CBBI")
+
     cbbi_emoji = emoji_dict[CBBI_INDEX_KEY]
     cbbi_description = get_full_metric_name(CBBI_INDEX_KEY)
     cbbi_value = int(data[CBBI_INDEX_KEY][timestamp] * 100)
@@ -219,6 +223,8 @@ def get_message_price(
         A nicely formatted string for the Bitcoin price.
 
     """
+    logger.debug("Formatting message line for Bitcoin price")
+
     price_emoji = emoji_dict[BITCOIN_PRICE_KEY]
     price_description = get_full_metric_name(BITCOIN_PRICE_KEY)
     price_value = data[BITCOIN_PRICE_KEY][timestamp]
