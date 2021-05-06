@@ -14,20 +14,6 @@ TOKEN = os.environ["TELEGRAM_TOKEN"]
 CBBI_INDEX_KEY = "Confidence"
 BITCOIN_PRICE_KEY = "Price"
 
-METRICS = [
-    "GoldenRatio",
-    "GoogleTrends",
-    "StockToFlow",
-    "PiCycle",
-    "2YMA",
-    "Trolololo",
-    "RUPL",
-    "Puell",
-    "MVRV",
-    "RHODL",
-    "ReserveRisk",
-]
-
 LONG_PARAMETER_NAMES = {
     "Confidence": "CBBI",
     "Price": "Bitcoin price",

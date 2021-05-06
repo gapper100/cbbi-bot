@@ -1,7 +1,8 @@
 import telegram
-from constants import CHANNEL_CHAT_ID, PRIVATE_CHAT_ID, TOKEN
-from functions import format_telegram_message, get_cbbi_data
 from loguru import logger
+
+from cbbi_bot.constants import CHANNEL_CHAT_ID, PRIVATE_CHAT_ID, TOKEN
+from cbbi_bot.functions import format_telegram_message, get_cbbi_data
 
 
 def send_message(event=None, context=None) -> None:
@@ -18,10 +19,10 @@ def send_message(event=None, context=None) -> None:
     bot = telegram.Bot(token=TOKEN)
 
     logger.info("Sending message to group...")
-    bot.sendMessage(chat_id=PRIVATE_CHAT_ID, text=message, parse_mode="MarkdownV2")
+    bot.sendMessage(PRIVATE_CHAT_ID, message, "MarkdownV2")
 
     logger.info("Sending message to channel...")
-    bot.sendMessage(chat_id=CHANNEL_CHAT_ID, text=message, parse_mode="MarkdownV2")
+    bot.sendMessage(CHANNEL_CHAT_ID, message, "MarkdownV2")
 
 
 if __name__ == "__main__":

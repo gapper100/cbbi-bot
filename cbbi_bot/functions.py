@@ -3,15 +3,15 @@ from typing import Dict
 
 import pytz
 import requests
-from constants import (
+from loguru import logger
+
+from cbbi_bot.constants import (
     API_URL,
     BITCOIN_PRICE_KEY,
     CBBI_INDEX_KEY,
     LONG_PARAMETER_NAMES,
-    METRICS,
     USER_AGENT,
 )
-from loguru import logger
 
 
 def get_cbbi_data() -> Dict[str, Dict[str, float]]:
@@ -84,7 +84,11 @@ def day_suffix(day: int) -> str:
 
     """
     logger.debug("Getting suffix for day of the month")
-    return "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    if 11 <= day <= 13:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    return suffix
 
 
 def custom_strftime(format_: str, timestamp: datetime) -> str:
@@ -118,12 +122,12 @@ def get_emoji_dict(data: Dict[str, Dict[str, float]]) -> Dict[str, str]:
     """
     logger.debug("Getting emoji dict")
     emoji_dict = {}
-    today_timestamp = get_timestamp_from_datetime(get_todays_datetime())
-    yesterday_timestamp = get_timestamp_from_datetime(get_yesterdays_datetime())
+    today_ts = get_timestamp_from_datetime(get_todays_datetime())
+    yesterday_ts = get_timestamp_from_datetime(get_yesterdays_datetime())
     for param in data.keys():
-        if data[param][today_timestamp] > data[param][yesterday_timestamp]:
+        if data[param][today_ts] > data[param][yesterday_ts]:
             emoji_dict[param] = "📈"
-        elif data[param][today_timestamp] < data[param][yesterday_timestamp]:
+        elif data[param][today_ts] < data[param][yesterday_ts]:
             emoji_dict[param] = "📉"
         else:
             emoji_dict[param] = "〰️️"
@@ -151,11 +155,84 @@ def get_full_metric_name(metric: str) -> str:
     return full_name
 
 
-def format_metric_message(
+def get_message_header(
+    data: Dict[str, Dict[str, float]], date_string: str, timestamp: str
+):
+    """Pretty format a message header line.
+
+    Args:
+        data: The CBBI data
+        date_string: A pretty string for today's date
+        timestamp: A timestamp string
+
+    Returns:
+        A nicely formatted header string.
+
+    """
+    cbbi_link = "[CBBI](https://cbbi.info/)"
+    cbbi_today = float(data[CBBI_INDEX_KEY][timestamp])
+    cbbi_warning = " ❗" if cbbi_today >= 0.9 else ""
+
+    header_line = f"_{cbbi_link} update for {date_string}{cbbi_warning}_\n"
+
+    return header_line
+
+
+def get_message_cbbi(
+    data: Dict[str, Dict[str, float]],
+    emoji_dict: Dict[str, str],
+    timestamp: str,
+):
+    """Pretty format a message line for the CBBI.
+
+    Args:
+        data: The CBBI data
+        emoji_dict: Emoji dictionary indicating a metric's direction of change
+        timestamp: A timestamp string
+
+    Returns:
+        A nicely formatted string for the CBBI.
+
+    """
+    cbbi_emoji = emoji_dict[CBBI_INDEX_KEY]
+    cbbi_description = get_full_metric_name(CBBI_INDEX_KEY)
+    cbbi_value = int(data[CBBI_INDEX_KEY][timestamp] * 100)
+
+    cbbi_line = f"\n{cbbi_emoji} *{cbbi_description}: {cbbi_value}*\n"
+
+    return cbbi_line
+
+
+def get_message_price(
+    data: Dict[str, Dict[str, float]],
+    emoji_dict: Dict[str, str],
+    timestamp: str,
+):
+    """Pretty format a message line for the Bitcoin price.
+
+    Args:
+        data: The CBBI data
+        emoji_dict: Emoji dictionary indicating a metric's direction of change
+        timestamp: A timestamp string
+
+    Returns:
+        A nicely formatted string for the Bitcoin price.
+
+    """
+    price_emoji = emoji_dict[BITCOIN_PRICE_KEY]
+    price_description = get_full_metric_name(BITCOIN_PRICE_KEY)
+    price_value = data[BITCOIN_PRICE_KEY][timestamp]
+
+    cbbi_line = f"\n{price_emoji} {price_description}: *${price_value:,.0f}*\n"
+
+    return cbbi_line
+
+
+def get_message_metric(
     data: Dict[str, Dict[str, float]],
     emoji_dict: Dict[str, str],
     metric: str,
-    today_timestamp: str,
+    timestamp: str,
 ) -> str:
     """Pretty format a message line for a CBBI metric.
 
@@ -163,17 +240,26 @@ def format_metric_message(
         data: The CBBI data
         emoji_dict: Emoji dictionary indicating a metric's direction of change
         metric: The metric to generate a string for
-        today_timestamp: A timestamp string for today
+        timestamp: A timestamp string
 
     Returns:
         A nicely formatted string for a particular metric.
 
     """
     logger.debug(f"Formatting message line for metric {metric}")
-    return (
-        f"\n{emoji_dict[metric]} {get_full_metric_name(metric)}: "
-        f"*{data[metric][today_timestamp]:.0%}*"
-    )
+
+    if metric not in [CBBI_INDEX_KEY, BITCOIN_PRICE_KEY]:
+        metric_value = data[metric][timestamp]
+        metric_emoji = emoji_dict[metric]
+        try:
+            metric_desc = get_full_metric_name(metric)
+            return f"\n{metric_emoji} {metric_desc}: *{metric_value:.0%}*"
+        except KeyError:
+            logger.warning(f"New metric {metric} found!")
+            return f"\n{metric_emoji} {metric}: *{metric_value:.0%}* 🆕"
+
+    else:
+        return ""
 
 
 def format_telegram_message(data: Dict[str, Dict[str, float]]) -> str:
@@ -187,19 +273,17 @@ def format_telegram_message(data: Dict[str, Dict[str, float]]) -> str:
 
     """
     logger.info("Formatting Telegram message...")
+
     today_dt = get_todays_datetime()
-    pretty_date_string = custom_strftime("%B {S}, %Y", today_dt)
-    today_timestamp = get_timestamp_from_datetime(today_dt)
+    today_ts = get_timestamp_from_datetime(today_dt)
+    pretty_date = custom_strftime("%B {S}, %Y", today_dt)
 
     emoji_dict = get_emoji_dict(data)
 
-    cbbi_warning = " ❗" if float(data[CBBI_INDEX_KEY][today_timestamp]) >= 0.9 else ""
-
-    message = f"""_[CBBI](https://cbbi.info/) update for {pretty_date_string}{cbbi_warning}_\n
-{emoji_dict[CBBI_INDEX_KEY]} *{get_full_metric_name(CBBI_INDEX_KEY)}: {int(data[CBBI_INDEX_KEY][today_timestamp]*100)}*\n
-{emoji_dict[BITCOIN_PRICE_KEY]} {get_full_metric_name(BITCOIN_PRICE_KEY)}: *${data[BITCOIN_PRICE_KEY][today_timestamp]:,.0f}*\n"""
-
-    for metric in METRICS:
-        message += format_metric_message(data, emoji_dict, metric, today_timestamp)
+    message = get_message_header(data, pretty_date, today_ts)
+    message += get_message_cbbi(data, emoji_dict, today_ts)
+    message += get_message_price(data, emoji_dict, today_ts)
+    for metric in data.keys():
+        message += get_message_metric(data, emoji_dict, metric, today_ts)
 
     return message
