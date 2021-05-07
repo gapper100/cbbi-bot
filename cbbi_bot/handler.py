@@ -18,11 +18,11 @@ def send_message(event=None, context=None) -> None:
     message = format_telegram_message(data)
     bot = telegram.Bot(token=TOKEN)
 
-    logger.info("Sending message to group...")
-    bot.sendMessage(PRIVATE_CHAT_ID, message, "MarkdownV2")
+    chats_to_send_to = [CHANNEL_CHAT_ID, PRIVATE_CHAT_ID]
 
-    logger.info("Sending message to channel...")
-    bot.sendMessage(CHANNEL_CHAT_ID, message, "MarkdownV2")
+    for chat in chats_to_send_to:
+        logger.info("Sending message...")
+        bot.sendMessage(chat, message, "MarkdownV2")
 
 
 if __name__ == "__main__":
