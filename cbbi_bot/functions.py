@@ -15,7 +15,8 @@ from cbbi_bot.constants import (
 
 
 def get_cbbi_data() -> Dict[str, Dict[str, float]]:
-    """Get JSON data from the API at colintalkscrypto.com/cbbi/data/latest.json.
+    """Get JSON data from the API at
+    colintalkscrypto.com/cbbi/data/latest.json.
 
     Returns:
         The CBBI data in a dictionary.
@@ -263,7 +264,6 @@ def get_message_metric(
         except KeyError:
             logger.warning(f"New metric {metric} found!")
             return f"\n{metric_emoji} {metric}: *{metric_value:.0%}* 🆕"
-
     else:
         return ""
 
