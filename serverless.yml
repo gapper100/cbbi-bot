@@ -16,6 +16,6 @@ functions:
     handler: cbbi_bot/handler.send_message
     events:
       # Invoke Lambda function (production at 8:00 UTC every day)
-      - schedule: cron(00 8 * * ? *)
+      - schedule: cron(00 9 * * ? *)
 plugins:
   - serverless-python-requirements
