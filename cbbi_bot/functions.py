@@ -201,7 +201,7 @@ def get_message_cbbi(
 
     cbbi_emoji = emoji_dict[CBBI_INDEX_KEY]
     cbbi_description = get_full_metric_name(CBBI_INDEX_KEY)
-    cbbi_value = int(data[CBBI_INDEX_KEY][timestamp] * 100)
+    cbbi_value = round(data[CBBI_INDEX_KEY][timestamp] * 100)
 
     cbbi_line = f"\n{cbbi_emoji} *{cbbi_description}: {cbbi_value}*\n"
 
