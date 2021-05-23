@@ -25,7 +25,7 @@ LONG_PARAMETER_NAMES = {
     "Trolololo": "Bitcoin Trolololo Trend Line",
     "RUPL": "RUPL/NUPL Chart",
     "Puell": "Puell Multiple",
-    "MVRV": "MVRV Z-score",
+    "MVRV": "MVRV Z-Score",
     "RHODL": "RHODL Ratio",
     "ReserveRisk": "Reserve Risk",
 }
